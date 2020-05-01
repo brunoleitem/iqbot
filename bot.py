@@ -5,7 +5,7 @@ from dateutil import tz
 
 
 
-def configuracao():
+def configuracao():  #Função para importar configurações
 	arquivo = configparser.RawConfigParser()
 	arquivo.read('config.txt')	
 	
@@ -18,7 +18,7 @@ API.connect()
 
 API.change_balance('PRACTICE') #real
 
-while True:
+while True:   #Mensagem de conexão
     if API.check_connect() == False:
         print('----------------------------------------------ERRO AO SE CONECTAR NESSA PORRA----------------------------------------------\n\n')
         API.connect()
@@ -29,9 +29,7 @@ while True:
     
     time.sleep(1)
     
-
-
-def perfil (): 
+def perfil ():  #Funçãp para pegar dados da conta
     perfil = json.loads(json.dumps(API.get_profile_ansyc()))
     
     return perfil
@@ -42,7 +40,7 @@ def timestamp_converter(x): # Função para converter timestamp
 	
 	return str(hora.astimezone(tz.gettz('America/Sao Paulo')))[:-6]
 
-def payout(par, tipo,timeframe = 5):
+def payout(par, tipo,timeframe = 5):  #Função para converter payout
 
     if tipo == 'digital':
     
@@ -56,13 +54,36 @@ def payout(par, tipo,timeframe = 5):
         API.unsubscribe_strike_list(par, timeframe)
         return d
 
+def carregar_sinais():  #Função para carregar sinais
+    arquivo = open('sinais.txt', encoding='UTF-8')
+    lista = arquivo.read()
+    arquivo.close
+
+    lista = lista.split('\n')
+
+    for index,a in enumerate(lista):
+        if a == '':
+            del lista[index]
+
+    return lista
+
+
 
  
 x = perfil() 
 print('Nome: ',x['name'],'\n')
 print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
 print('\n\n')
- 
+
+
+lista = carregar_sinais()
+for sinal in lista:
+    dados = sinal.split(',')
+    print(dados[0])
+    print(dados[1])
+    print(dados[2])
+print('\n\n')
+    
 par = API.get_all_open_time()
 print('ATIVOS ABERTOS:')
 for paridade in par['digital']: 

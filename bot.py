@@ -10,10 +10,11 @@ API.change_balance('PRACTICE') #real
 
 while True:
     if API.check_connect() == False:
-        print('erro')
+        print('----------------------------------------------ERRO AO SE CONECTAR NESSA PORRA----------------------------------------------\n\n')
         API.connect()
     else:
-        print('logado para ser milionario\n\n')
+        print('\n\n')
+        print('----------------------------------------------LOGADO PARA SER MILIONARIO----------------------------------------------\n\n')
         break 
     
     time.sleep(1)
@@ -46,17 +47,20 @@ def payout(par, tipo,timeframe = 5):
         return d
  
 x = perfil() 
-print('Saldo da conta:',x['balance'],x['currency']) 
+print('Nome: ',x['name'],'\n')
+print('Saldo:',x['balance'],x['currency'],'\n') 
 print('\n\n')
  
 par = API.get_all_open_time()
-
+print('ATIVOS ABERTOS:')
 for paridade in par['digital']: 
-    if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > 90:
+    if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > 80:
   
          print('DIGITAL: '+paridade+' PAYOUT:'+str(payout(paridade,'digital')))
-    else:
-         print('vai se fude python')
+for paridade in par['digital']: 
+    if par['digital'][paridade]['open'] == True:
+  
+         print('DIGITAL: '+paridade+' PAYOUT:'+str(payout(paridade,'digital')))
 '''
 if par == true
     elif: payout > 70:

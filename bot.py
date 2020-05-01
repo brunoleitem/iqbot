@@ -46,7 +46,8 @@ def payout(par, tipo,timeframe = 5):
         return d
  
 x = perfil() 
-print(x['balance'],x['currency'])
+print('Saldo da conta:',x['balance'],x['currency']) 
+print('\n\n')
  
 par = API.get_all_open_time()
 

@@ -1,9 +1,19 @@
 from iqoptionapi.stable_api import IQ_Option
-import time, json, logging
+import time, json, logging, configparser
 from datetime import datetime
 from dateutil import tz
 
-API = IQ_Option ('savibrgamer@gmail.com','testerobo')
+
+
+def configuracao():
+	arquivo = configparser.RawConfigParser()
+	arquivo.read('config.txt')	
+	
+	return {'login': arquivo.get('GERAL', 'login'), 'senha': arquivo.get('GERAL', 'senha'), 'payout_min': arquivo.get('GERAL', 'payout_min')}
+
+
+config = configuracao() 
+API = IQ_Option (config['login'],config['senha'])
 API.connect()
 
 API.change_balance('PRACTICE') #real
@@ -45,23 +55,28 @@ def payout(par, tipo,timeframe = 5):
             time.sleep(1)
         API.unsubscribe_strike_list(par, timeframe)
         return d
+
+
  
 x = perfil() 
 print('Nome: ',x['name'],'\n')
-print('Saldo:',x['balance'],x['currency'],'\n') 
+print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
 print('\n\n')
  
 par = API.get_all_open_time()
 print('ATIVOS ABERTOS:')
 for paridade in par['digital']: 
-    if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > 80:
-  
-         print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
-for paridade in par['digital']: 
     if par['digital'][paridade]['open'] == True:
   
-         print('DIGITAL: '+paridade+' PAYOUT:'+str(payout(paridade,'digital')))
+         print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
+
 '''
+for paridade in par['digital']: 
+    if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > config['payout_min']:
+  
+         print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
+
+
 if par == true
     elif: payout > 70:
         {

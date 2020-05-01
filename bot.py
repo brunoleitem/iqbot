@@ -56,7 +56,7 @@ print('ATIVOS ABERTOS:')
 for paridade in par['digital']: 
     if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > 80:
   
-         print('DIGITAL: '+paridade+' PAYOUT:'+str(payout(paridade,'digital')))
+         print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
 for paridade in par['digital']: 
     if par['digital'][paridade]['open'] == True:
   

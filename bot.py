@@ -41,10 +41,7 @@ def timestamp_converter(x): # Função para converter timestamp
 	return str(hora.astimezone(tz.gettz('America/Sao Paulo')))[:-6]
 
 
-def conferehora(): #função para conferir as horas juntas
-    datual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    return datual
-    
+
  
 def payout(par, tipo,timeframe = 5):  #Função para converter payout
 
@@ -72,9 +69,8 @@ def carregar_sinais():  #Função para carregar sinais
             del lista[index]
 
     return lista
+    
 
-z = conferehora()
-print(z)
  
 x = perfil() 
 print('Nome: ',x['name'],'\n')
@@ -91,6 +87,11 @@ for sinal in lista:
 print('\n\n')
 
 
+
+while True:
+    datual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    time.sleep(1)
+    
 
 
 

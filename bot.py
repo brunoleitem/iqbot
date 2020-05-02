@@ -9,7 +9,7 @@ def configuracao():  #Função para importar configurações
 	arquivo = configparser.RawConfigParser()
 	arquivo.read('config.txt')	
 	
-	return {'login': arquivo.get('GERAL', 'login'), 'senha': arquivo.get('GERAL', 'senha'), 'payout_min': arquivo.get('GERAL', 'payout_min'),'conta': arquivo.get('GERAL', 'conta')}
+	return {'login': arquivo.get('GERAL', 'login'), 'senha': arquivo.get('GERAL', 'senha'), 'payout_min': arquivo.get('GERAL', 'payout_min'),'conta': arquivo.get('GERAL', 'conta'), 'valor_entrada': arquivo.get('GERAL', 'valor_entrada'), 'tempo': arquivo.get('GERAL', 'tempo')}
 
 
 config = configuracao() 
@@ -40,9 +40,6 @@ def timestamp_converter(x): # Função para converter timestamp
 	
 	return str(hora.astimezone(tz.gettz('America/Sao Paulo')))[:-6]
 
-
-
- 
 def payout(par, tipo,timeframe = 5):  #Função para converter payout
 
     if tipo == 'digital':
@@ -69,9 +66,8 @@ def carregar_sinais():  #Função para carregar sinais
             del lista[index]
 
     return lista
-    
 
- 
+
 x = perfil() 
 print('Nome: ',x['name'],'\n')
 print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
@@ -87,35 +83,33 @@ for sinal in lista:
 print('\n\n')
 
 
-
+par = API.get_all_open_time()
 while True:
     datual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(datual)
     time.sleep(1)
-    
+    for paridade in par['digital']: 
+        if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > int(config['payout_min']):
+      
+            if datual == dados[0]:
+                status,id = API.buy_digital_spot(dados[1],config['valor_entrada'],dados[2],config['tempo'])    
+                break
+            else:
+                print('Ativo sem condicoes')
+            
 
-
-
-'''    pares abertos pa
-par = API.get_all_open_time()
 print('ATIVOS ABERTOS:')
 for paridade in par['digital']: 
     if par['digital'][paridade]['open'] == True:
   
          print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
-for paridade in par['digital']: 
-    if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > config['payout_min']:
-  
-         print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
-if par == true
-    elif: payout > 70:
-        {
-        buy
-        }
-    else
-    print"ativo sem condicoes"
-    
 
 
+
+
+
+
+'''
 ativo = 'EURUSD-OTC'
 valor_entrada = 2
 direcao = 'call'
@@ -123,7 +117,9 @@ tempo = 1
 
 if ativo == dados[1]:
     status,id = API.buy_digital_spot(ativo, valor_entrada, direcao, tempo)  #Status retorna false ou true e id é o id da operação
-
+'''    
+    
+    
 #Print do resultado
 if isinstance(id, int):
 	while True:
@@ -137,10 +133,14 @@ if isinstance(id, int):
 			break
 
 
-
-
+'''
 print('Saldo:',saldo_atualizado,x['currency'],'\n') 
 '''
+
+
+
+
+
 
 
 

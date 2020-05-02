@@ -9,14 +9,14 @@ def configuracao():  #Função para importar configurações
 	arquivo = configparser.RawConfigParser()
 	arquivo.read('config.txt')	
 	
-	return {'login': arquivo.get('GERAL', 'login'), 'senha': arquivo.get('GERAL', 'senha'), 'payout_min': arquivo.get('GERAL', 'payout_min')}
+	return {'login': arquivo.get('GERAL', 'login'), 'senha': arquivo.get('GERAL', 'senha'), 'payout_min': arquivo.get('GERAL', 'payout_min'),'conta': arquivo.get('GERAL', 'conta')}
 
 
 config = configuracao() 
 API = IQ_Option (config['login'],config['senha'])
 API.connect()
 
-API.change_balance('PRACTICE') #real
+API.change_balance(config['conta']) #REAL, PRACTICE
 
 while True:   #Mensagem de conexão
     if API.check_connect() == False:
@@ -29,7 +29,7 @@ while True:   #Mensagem de conexão
     
     time.sleep(1)
     
-def perfil ():  #Funçãp para pegar dados da conta
+def perfil ():  #Função para pegar dados da conta
     perfil = json.loads(json.dumps(API.get_profile_ansyc()))
     
     return perfil
@@ -67,8 +67,6 @@ def carregar_sinais():  #Função para carregar sinais
 
     return lista
 
-
-
  
 x = perfil() 
 print('Nome: ',x['name'],'\n')
@@ -83,7 +81,8 @@ for sinal in lista:
     print(dados[1])
     print(dados[2])
 print('\n\n')
-    
+
+'''    pares abertos pa
 par = API.get_all_open_time()
 print('ATIVOS ABERTOS:')
 for paridade in par['digital']: 
@@ -91,7 +90,7 @@ for paridade in par['digital']:
   
          print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
 
-'''
+
 for paridade in par['digital']: 
     if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > config['payout_min']:
   
@@ -108,3 +107,38 @@ if par == true
     
 
 '''
+
+ativo = 'EURUSD-OTC'
+valor_entrada = 2
+direcao = 'call'
+tempo = 1
+
+if ativo == dados[1]:
+    status,id = API.buy_digital_spot(ativo, valor_entrada, direcao, tempo)  #Status retorna false ou true e id é o id da operação
+
+#Print do resultado
+if isinstance(id, int):
+	while True:
+		status,lucro = API.check_win_digital_v2(id)   
+		
+		if status:  
+			if lucro > 0:
+				print('RESULTADO: WIN / LUCRO: '+str(round(lucro, 2)))
+			else:
+				print('RESULTADO: LOSS / LUCRO: -'+str(valor_entrada))
+			break
+
+
+'''
+print('Saldo:',saldo_atualizado,x['currency'],'\n') 
+'''
+
+
+
+
+
+
+
+
+
+

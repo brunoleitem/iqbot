@@ -2,3 +2,4 @@
 login = savibrgamer@gmail.com
 senha = testerobo
 payout_min = 80
+conta = PRACTICE

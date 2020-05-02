@@ -40,6 +40,12 @@ def timestamp_converter(x): # Função para converter timestamp
 	
 	return str(hora.astimezone(tz.gettz('America/Sao Paulo')))[:-6]
 
+
+def conferehora(): #função para conferir as horas juntas
+    datual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return datual
+    
+ 
 def payout(par, tipo,timeframe = 5):  #Função para converter payout
 
     if tipo == 'digital':
@@ -67,6 +73,8 @@ def carregar_sinais():  #Função para carregar sinais
 
     return lista
 
+z = conferehora()
+print(z)
  
 x = perfil() 
 print('Nome: ',x['name'],'\n')
@@ -82,6 +90,10 @@ for sinal in lista:
     print(dados[2])
 print('\n\n')
 
+
+
+
+
 '''    pares abertos pa
 par = API.get_all_open_time()
 print('ATIVOS ABERTOS:')
@@ -89,14 +101,10 @@ for paridade in par['digital']:
     if par['digital'][paridade]['open'] == True:
   
          print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
-
-
 for paridade in par['digital']: 
     if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > config['payout_min']:
   
          print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
-
-
 if par == true
     elif: payout > 70:
         {
@@ -106,7 +114,6 @@ if par == true
     print"ativo sem condicoes"
     
 
-'''
 
 ativo = 'EURUSD-OTC'
 valor_entrada = 2
@@ -129,14 +136,10 @@ if isinstance(id, int):
 			break
 
 
-'''
+
+
 print('Saldo:',saldo_atualizado,x['currency'],'\n') 
 '''
-
-
-
-
-
 
 
 

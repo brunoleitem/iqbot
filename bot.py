@@ -28,7 +28,7 @@ while True:   #Mensagem de conexão
     
     time.sleep(1)
     
-def perfil ():  #Função para pegar dados da conta
+def perfil():  #Função para pegar dados da conta
     perfil = json.loads(json.dumps(API.get_profile_ansyc()))
     
     return perfil
@@ -79,7 +79,8 @@ def conferepar(atv):
     return atvop
 
 def operacao_thread ():
-    status,id = API.buy_digital_spot(ativo_sinal,entrada_sinal,direcao_sinal,tempo_sinal)     
+    status,id = API.buy_digital_spot(ativo_sinal,entrada_sinal,direcao_sinal,tempo_sinal) 
+    time.sleep(1)    
     #Print do resultado
     if isinstance(id, int):
         while True:
@@ -108,31 +109,30 @@ def operacao_thread ():
     return
 
 
-
 x = perfil() 
 print('Nome: ',x['name'],'\n')
 print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
 print('\n\n')
 
+print('APERTE ENTER PARA CONTINUAR')   
+input()
+
 
 lista = carregar_sinais()
 for sinal in lista:
     dados = sinal.split(',')
-    print('\n')
-    print('Sinal em analise')
-    print(dados[0])
-    print(dados[1])
-    print(dados[2])
-    print('\n')
+    
     ativo_sinal = dados[1]
     entrada_sinal = float(config['valor_entrada'])
     direcao_sinal = dados[2]
     tempo_sinal = int(config['tempo'])
-#def robocaralho():
+    
     if str(payout(dados[1],'digital')) > str(config['payout_min']) and conferepar(ativo_sinal) == True:
-        print('CONDIÇOES SATISFEITAS')
-        print('ESPERANDO PARA ENTRAR NA OPERAÇAO')
         print('\n')
+        print('Ativo: ' +str(dados[1]) )
+        print('Hora: ' +str(dados[0]) )
+        print('Direção: ' +str(dados[2]) )
+        print('EM ESPERA')
         while True:
             delay = int(config['delay'])
             d = datetime.now() + timedelta(seconds=int(delay))
@@ -141,25 +141,21 @@ for sinal in lista:
 
             if datual == dados[0]:
                 print('ENTROU NA OPERAÇAO')
-                print('\n')
                 t1 = Thread(target= operacao_thread,args=[])
                 t1.start()
                 break                
             elif datual > dados[0]:
-                print('Tempo expirado')
+                print('PERDEU O TIMING NENEM')
                 break
     else:
-        print('ativo sem condiçoes')
         print('\n')
-    #return
-#t2 = Thread(target= robocaralho, args= [])
-#t2.start()
+        print('Ativo: ' +str(dados[1]) )
+        print('Hora: ' +str(dados[0]) )
+        print('Direção: ' +str(dados[2]) )
+        print('     ATIVO NEGADO')
+        print('SEM CONDIÇOES DE ENTRADA')
+        print('\n')
 
-print('ROBO DESLIGADO!')
-
-
-''' 
-d = datetime.now() - timedelta(seconds=3)
-datual = d.strftime('%Y-%m-%d %H:%M:%S')
-time.sleep(0.100)
-''' 
+print('\n')
+print('SEM MAIS SINAIS')        
+print('\n')

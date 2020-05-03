@@ -67,11 +67,23 @@ def carregar_sinais():  #Função para carregar sinais
 
     return lista
 
+def conferepar(atv):
+    par = API.get_all_open_time()
+    for paridade in par['digital']: 
+        if par['digital'][paridade]['open'] == True:
+            if str(atv) == str(paridade):
+                atvop = 1
+            else:
+                atvop = 0
+    return atvop
+
+
 
 x = perfil() 
 print('Nome: ',x['name'],'\n')
 print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
 print('\n\n')
+
 
 
 lista = carregar_sinais()
@@ -82,43 +94,42 @@ for sinal in lista:
     print(dados[2])
 print('\n\n')
 
+print(dados[1])
+#z = conferepar(dados[1])
+#print(z)
 
-par = API.get_all_open_time()
+'''
 while True:
     datual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(datual)
     time.sleep(1)
-    for paridade in par['digital']: 
-        if par['digital'][paridade]['open'] == True and int(payout(paridade,'digital')) > int(config['payout_min']):
-      
-            if datual == dados[0]:
-                status,id = API.buy_digital_spot(dados[1],config['valor_entrada'],dados[2],config['tempo'])    
-                break
-            else:
-                print('Ativo sem condicoes')
+    if datual == dados[0]:
+
+
+            if par['digital'][paridade]['open'] == True and str(payout(paridade,'digital')) > str(config['payout_min']):
+                print('entrou')
+                status,id = API.buy_digital_spot(dados[1],config['valor_entrada'],dados[2],config['tempo'])
+        break
+    
+ '''   
+
             
-
-print('ATIVOS ABERTOS:')
-for paridade in par['digital']: 
-    if par['digital'][paridade]['open'] == True:
-  
-         print('[DIGITAL] '+paridade+' | PAYOUT:'+str(payout(paridade,'digital')))
-
-
-
-
-
-
+ 
 '''
+print('ATIVOS ABERTOS:')
+
+
+
+
+
+
 ativo = 'EURUSD-OTC'
 valor_entrada = 2
 direcao = 'call'
 tempo = 1
-
 if ativo == dados[1]:
     status,id = API.buy_digital_spot(ativo, valor_entrada, direcao, tempo)  #Status retorna false ou true e id é o id da operação
-'''    
-    
+
     
 #Print do resultado
 if isinstance(id, int):
@@ -133,16 +144,7 @@ if isinstance(id, int):
 			break
 
 
-'''
 print('Saldo:',saldo_atualizado,x['currency'],'\n') 
 '''
-
-
-
-
-
-
-
-
 
 

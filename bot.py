@@ -79,6 +79,12 @@ def conferepar(atv):
     return atvop
 
 def operacao_thread ():
+    print('\n')
+    print('Ativo: ' +str(dados[1]) )
+    print('Hora: ' +str(dados[0]) )
+    print('Direção: ' +str(dados[2]) )
+    print('EM ESPERA')
+    print('ENTROU NA OPERAÇAO')
     status,id = API.buy_digital_spot(ativo_sinal,entrada_sinal,direcao_sinal,tempo_sinal) 
     time.sleep(1)    
     #Print do resultado
@@ -140,12 +146,18 @@ for sinal in lista:
             time.sleep(0.100)
 
             if datual == dados[0]:
+                print('\n')
+                print('Ativo: ' +str(dados[1]) )
+                print('Hora: ' +str(dados[0]) )
+                print('Direção: ' +str(dados[2]) )
+                print('EM ESPERA')
                 print('ENTROU NA OPERAÇAO')
                 t1 = Thread(target= operacao_thread,args=[])
                 t1.start()
+                time.sleep(1)
                 break                
             elif datual > dados[0]:
-                print('PERDEU O TIMING NENEM')
+                print('SINAL EXPIRADO')
                 break
     else:
         print('\n')
@@ -156,6 +168,7 @@ for sinal in lista:
         print('SEM CONDIÇOES DE ENTRADA')
         print('\n')
 
+        
 print('\n')
 print('SEM MAIS SINAIS')        
 print('\n')

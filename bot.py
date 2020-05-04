@@ -79,25 +79,40 @@ def conferepar(atv):
     return atvop
 
 def operacao_thread ():
+
     print('\n')
     print('Ativo: ' +str(dados[1]) )
     print('Hora: ' +str(dados[0]) )
     print('Direção: ' +str(dados[2]) )
-    print('EM ESPERA')
-    print('ENTROU NA OPERAÇAO')
+    print('--------------------------------------------------------------------------------')
+    print('                              ENTROU NA OPERAÇAO')
+    print('--------------------------------------------------------------------------------')
     status,id = API.buy_digital_spot(ativo_sinal,entrada_sinal,direcao_sinal,tempo_sinal) 
     time.sleep(1)    
-    #Print do resultado
     if isinstance(id, int):
         while True:
             status,lucro = API.check_win_digital_v2(id)
             if status:  
                 if lucro > 0:
-                    resultado_operacao = str('RESULTADO: WIN / LUCRO: '+str(round(lucro, 2)))
-                    print(resultado_operacao)
+                    print('\n')
+                    print('Ativo: ' +str(dados[1]) )
+                    print('Hora: ' +str(dados[0]) )
+                    print('Direção: ' +str(dados[2]) )
+                    print('--------------------------------------------------------------------------------') 
+                    print('                                   WIN ')
+                    print('                               LUCRO: '+str(round(lucro, 2)))
+                    print('--------------------------------------------------------------------------------')
                 else:
-                    resultado_operacao = str('RESULTADO: LOSS / LUCRO: -'+str(entrada_sinal))
-                    print(resultado_operacao)
+                    print('\n')
+                    print('Ativo: ' +str(dados[1]) )
+                    print('Hora: ' +str(dados[0]) )
+                    print('Direção: ' +str(dados[2]) )
+                    print('--------------------------------------------------------------------------------') 
+                    print('                                   LOSS') 
+                    print('                              PERDA: -'+str(entrada_sinal))
+                    print('                          ENTRANDO COM MARTIN GALE') 
+                    print('--------------------------------------------------------------------------------') 
+                    '''
                     entrada_sinal_gale = int(entrada_sinal) * int(config['fator_gale'])
                     status,id = API.buy_digital_spot(ativo_sinal,entrada_sinal_gale,direcao_sinal,tempo_sinal)
                     if isinstance(id, int):
@@ -106,11 +121,10 @@ def operacao_thread ():
                             if status:  
                                 if lucro > 0:
                                     resultado_operacao = str('RESULTADO GALE: WIN / LUCRO: '+str(round(lucro, 2)))
-                                    print(resultado_operacao)
                                 else:
                                     resultado_operacao = str('RESULTADO GALE: LOSS / LUCRO: -'+str(entrada_sinal))
-                                    print(resultado_operacao)
                                 break
+                    '''
                 break           
     return
 
@@ -127,7 +141,7 @@ input()
 lista = carregar_sinais()
 for sinal in lista:
     dados = sinal.split(',')
-    
+
     ativo_sinal = dados[1]
     entrada_sinal = float(config['valor_entrada'])
     direcao_sinal = dados[2]
@@ -138,7 +152,9 @@ for sinal in lista:
         print('Ativo: ' +str(dados[1]) )
         print('Hora: ' +str(dados[0]) )
         print('Direção: ' +str(dados[2]) )
-        print('EM ESPERA')
+        print('--------------------------------------------------------------------------------')
+        print('                                 EM ESPERA')
+        print('--------------------------------------------------------------------------------')
         while True:
             delay = int(config['delay'])
             d = datetime.now() + timedelta(seconds=int(delay))
@@ -146,29 +162,26 @@ for sinal in lista:
             time.sleep(0.100)
 
             if datual == dados[0]:
-                print('\n')
-                print('Ativo: ' +str(dados[1]) )
-                print('Hora: ' +str(dados[0]) )
-                print('Direção: ' +str(dados[2]) )
-                print('EM ESPERA')
-                print('ENTROU NA OPERAÇAO')
                 t1 = Thread(target= operacao_thread,args=[])
                 t1.start()
                 time.sleep(1)
                 break                
             elif datual > dados[0]:
-                print('SINAL EXPIRADO')
+                print('--------------------------------------------------------------------------------')
+                print('                               SINAL EXPIRADO')
+                print('--------------------------------------------------------------------------------')
                 break
     else:
         print('\n')
         print('Ativo: ' +str(dados[1]) )
         print('Hora: ' +str(dados[0]) )
         print('Direção: ' +str(dados[2]) )
-        print('     ATIVO NEGADO')
-        print('SEM CONDIÇOES DE ENTRADA')
+        print('--------------------------------------------------------------------------------')
+        print('                               ATIVO NEGADO')
+        print('                         SEM CONDIÇOES DE ENTRADA')
+        print('--------------------------------------------------------------------------------')
         print('\n')
 
-        
 print('\n')
 print('SEM MAIS SINAIS')        
 print('\n')

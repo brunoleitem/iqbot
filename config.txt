@@ -1,9 +1,9 @@
 [GERAL]
 login = savibrgamer@gmail.com
 senha = testerobo
-payout_min = 80
+payout_min = 50
 conta = PRACTICE
 valor_entrada = 10
 tempo = 1
-delay = 1
+delay = -3
 fator_gale = 3

@@ -86,8 +86,6 @@ def conferepar(atv):
     return atvop
 
 
-
-
 x = perfil() 
 print('Nome: ',x['name'],'\n')
 print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
@@ -122,10 +120,8 @@ def sinais_thread ():
 
                 print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                              ENTROU NA OPERAÇAO\n--------------------------------------------------------------------------------')
 
-                status,id = API.buy_digital_spot(ativo_sinal_entrada,valor_sinal_entrada,direcao_sinal_entrada,tempo_sinal_entrada) 
-                time.sleep(1)    
-
-
+                status,id = API.buy_digital_spot(ativo_sinal_entrada,valor_sinal_entrada,direcao_sinal_entrada,tempo_sinal_entrada)  
+                
                 if isinstance(id, int):
                     while True:
                         status,lucro = API.check_win_digital_v2(id)
@@ -135,7 +131,6 @@ def sinais_thread ():
                             else:
                                 print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                                   LOSS\n                              PERDA: -'+str(valor_sinal_entrada)+ '\n                          ENTRANDO COM MARTIN GALE\n--------------------------------------------------------------------------------')                               
                                 
-                                '''
                                 valor_sinal_entrada_gale = int(valor_sinal_entrada) * int(config['fator_gale'])
                                 status,id = API.buy_digital_spot(ativo_sinal_entrada,valor_sinal_entrada_gale,direcao_sinal_entrada,tempo_sinal_entrada)
                                 if isinstance(id, int):
@@ -143,11 +138,10 @@ def sinais_thread ():
                                         status,lucro = API.check_win_digital_v2(id)
                                         if status:  
                                             if lucro > 0:
-                                                resultado_operacao = str('RESULTADO GALE: WIN / LUCRO: '+str(round(lucro, 2)))
+                                                print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                                WIN GALE\n                               LUCRO: ' +str(round(lucro, 2))+ '\n--------------------------------------------------------------------------------')
                                             else:
-                                                resultado_operacao = str('RESULTADO GALE: LOSS / LUCRO: -'+str(valor_sinal_entrada))
+                                                print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                                 LOSS GALE\n                              PERDA: -'+str(valor_sinal_entrada)+ '\n--------------------------------------------------------------------------------')
                                             break
-                                '''
                             break
                 break                
             elif datual > tempo_sinal:
@@ -170,5 +164,3 @@ for sinal in lista:
     t2 = Thread(target= sinais_thread, args=[])
     t2.start()
     time.sleep(2)
-
-

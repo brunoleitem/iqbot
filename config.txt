@@ -1,14 +1,15 @@
 [LOGIN]
 login = savibrgamer@gmail.com
 senha = testerobo
+#PRACTICE, REAL#
 conta = PRACTICE
 
 [ENTRADA]
 payout_min = 50
-valor_entrada = 10
-tempo = 1
+valor_entrada = 5
+timeframe = 1
 fator_gale = 3
 
 [DELAY]
 ativo_base = EURUSD
-delay = -1
+delay = -3

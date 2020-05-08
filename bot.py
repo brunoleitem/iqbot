@@ -4,17 +4,18 @@ from threading import Thread
 from datetime import datetime, timedelta
 from dateutil import tz
 
-testedelay = input('Quer iniciar teste de delay? y/n\n')
+input_inicial = input('APERTE ENTER PARA INICIAR O ROBÔ\n')
 
 #Tem que ser loadado primeiro
 def configuracao():  #Função para importar configurações
 	arquivo = configparser.RawConfigParser()
 	arquivo.read('config.txt')	
 	
-	return {'login': arquivo.get('LOGIN', 'login'), 'senha': arquivo.get('LOGIN', 'senha'), 'payout_min': arquivo.get('ENTRADA', 'payout_min'),'conta': arquivo.get('LOGIN', 'conta'), 'valor_entrada': arquivo.get('ENTRADA', 'valor_entrada'), 'tempo': arquivo.get('ENTRADA', 'tempo'), 'delay': arquivo.get('DELAY', 'delay'), 'fator_gale': arquivo.get('ENTRADA', 'fator_gale'), 'ativo_base': arquivo.get('DELAY', 'ativo_base')}
+	return {'login': arquivo.get('LOGIN', 'login'), 'senha': arquivo.get('LOGIN', 'senha'), 'payout_min': arquivo.get('ENTRADA', 'payout_min'),'conta': arquivo.get('LOGIN', 'conta'), 'valor_entrada': arquivo.get('ENTRADA', 'valor_entrada'), 'timeframe': arquivo.get('ENTRADA', 'timeframe'), 'delay': arquivo.get('DELAY', 'delay'), 'fator_gale': arquivo.get('ENTRADA', 'fator_gale'), 'ativo_base': arquivo.get('DELAY', 'ativo_base')}
 config = configuracao()
 
-if testedelay == 'y':
+#Teste delay
+if input_inicial == 's' or input_inicial == 'S' :
     API = IQ_Option (config['login'],config['senha'])
     API.connect()
     API.change_balance('PRACTICE')
@@ -44,11 +45,22 @@ if testedelay == 'y':
             status,id = API.buy_digital_spot(ativo_sinal_entrada,valor_sinal_entrada,direcao_sinal_entrada,tempo_sinal_entrada)  
             exit()
 
+#Teste da API
+if input_inicial == 'teste':
+    API = IQ_Option (config['login'],config['senha'])
+    API.connect()
+    API.change_balance('PRACTICE')
+
+
+    encerrar = input('encerrar?')
+    if encerrar == 's':
+        exit()
+
+
 #Tem que ser loadado antes de request na API
 API = IQ_Option (config['login'],config['senha'])
 API.connect()
 API.change_balance(config['conta'])
-printdadosteste = True
 
 def carregar_sinais():  
         arquivo = open('sinais.txt', encoding='UTF-8')
@@ -120,69 +132,86 @@ print('Nome: ',x['name'],'\n')
 print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
 print('\n\n')
 
-
 def sinais_thread ():
-    tempo_sinal = dados[0]
+
+    def checkwin_gale():
+        ativo_checkwin = ativo_sinal
+        hora_checkwin = hora_sinal
+        direcao_checkwin = direcao_sinal
+        valor_checkwin = valor_sinal
+        tempo_checkwin = tempo_sinal
+        valor_sinal_gale = int(valor_checkwin) * int(config['fator_gale'])
+        prox_sinal = datetime.strptime(hora_checkwin, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=1)
+        while True:
+            d = datetime.now() + timedelta(seconds=int(delay))
+            d14 = d.strftime('%Y-%m-%d %H:%M:%S')
+            d_prox_sinal = datetime.strptime(d14, '%Y-%m-%d %H:%M:%S')
+            if d_prox_sinal == prox_sinal:
+                candles_get = API.get_candles(ativo_checkwin, tempo_checkwin*60, 1, time.time())
+                open_candle = candles_get[0]['open']
+                close_candle = candles_get[0]['close']
+                if (close_candle < open_candle and direcao_checkwin == 'call') or (close_candle > open_candle and direcao_checkwin == 'put'):
+                    status, id = API.buy_digital_spot(ativo_checkwin,valor_sinal_gale,direcao_checkwin,tempo_checkwin)
+                    print('\nAtivo: ' +str(ativo_checkwin)+ '\nHora: ' +str(hora_checkwin)+ '\nDireção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                          ENTROU NA OPERAÇAO (GALE)\n--------------------------------------------------------------------------------')
+                    if isinstance(id, int):    
+                        while True:          
+                            status,lucro = API.check_win_digital_v2(id)
+                            if status:  
+                                if lucro > 0:
+                                    print('\nAtivo: ' +str(ativo_checkwin)+ '\nHora: ' +str(hora_checkwin)+ '\nDireção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                 WIN GALE\n                               LUCRO: ' +str(round(lucro, 2))+ '\n--------------------------------------------------------------------------------')
+                                else:
+                                    print('\nAtivo: ' +str(ativo_checkwin)+ '\nHora: ' +str(hora_checkwin)+ '\nDireção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                 LOSS GALE\n                                PERDA: -'+str(valor_checkwin)+ '\n--------------------------------------------------------------------------------')                               
+                                break
+                        break 
+        return
+    
+    hora_sinal = dados[0]
     ativo_sinal = dados[1]
     direcao_sinal = dados[2]
-    if str(payout(dados[1],'digital')) > str(config['payout_min']) and conferepar(ativo_signal) == True:
-        if printdadosteste == True:
-            print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(tempo_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                 EM ESPERA\n--------------------------------------------------------------------------------')
+    valor_sinal = float(config['valor_entrada'])
+    tempo_sinal = int(config['timeframe'])
+    if str(payout(dados[1],'digital')) > str(config['payout_min']) and conferepar(ativo_signal) == True: #Em espera
+        print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                 EM ESPERA\n--------------------------------------------------------------------------------')
         while True:
             delay = int(config['delay'])
             d = datetime.now() + timedelta(seconds=int(delay))
             datual = d.strftime('%Y-%m-%d %H:%M:%S')
             time.sleep(0.100)
 
-            if datual == tempo_sinal:
-                hora_sinal_entrada = tempo_sinal
-                ativo_sinal_entrada = ativo_sinal
-                valor_sinal_entrada = float(config['valor_entrada'])
-                direcao_sinal_entrada = direcao_sinal
-                tempo_sinal_entrada = int(config['tempo'])
-                print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                              ENTROU NA OPERAÇAO\n--------------------------------------------------------------------------------')
+            if datual == hora_sinal:
+                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                              ENTROU NA OPERAÇAO\n--------------------------------------------------------------------------------')
 
-                status,id = API.buy_digital_spot(ativo_sinal_entrada,valor_sinal_entrada,direcao_sinal_entrada,tempo_sinal_entrada)  
-                
+                status, id = API.buy_digital_spot(ativo_sinal,valor_sinal,direcao_sinal,tempo_sinal)
                 if isinstance(id, int):
-                    while True:
+                    
+                    #Gale por diferença
+                    t1 = Thread(target= checkwin_gale, args=[])
+                    t1.start()
+
+                    while True:        
                         status,lucro = API.check_win_digital_v2(id)
+                        
                         if status:  
                             if lucro > 0:
-                                print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                                   WIN\n                               LUCRO: ' +str(round(lucro, 2))+ '\n--------------------------------------------------------------------------------')
+                                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                     WIN\n                               LUCRO: ' +str(round(lucro, 2))+ '\n--------------------------------------------------------------------------------')
                             else:
-                                print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                                   LOSS\n                              PERDA: -'+str(valor_sinal_entrada)+ '\n                          ENTRANDO COM MARTIN GALE\n--------------------------------------------------------------------------------')                               
-                                
-                                valor_sinal_entrada_gale = int(valor_sinal_entrada) * int(config['fator_gale'])
-                                status,id = API.buy_digital_spot(ativo_sinal_entrada,valor_sinal_entrada_gale,direcao_sinal_entrada,tempo_sinal_entrada)
-                                if isinstance(id, int):
-                                    while True:
-                                        status,lucro = API.check_win_digital_v2(id)
-                                        if status:  
-                                            if lucro > 0:
-                                                print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                                WIN GALE\n                               LUCRO: ' +str(round(lucro, 2))+ '\n--------------------------------------------------------------------------------')
-                                            else:
-                                                print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                                 LOSS GALE\n                              PERDA: -'+str(valor_sinal_entrada)+ '\n--------------------------------------------------------------------------------')
-                                            break
+                                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                    LOSS\n                                PERDA: -'+str(valor_sinal)+ '\n--------------------------------------------------------------------------------')                                 
                             break
+                    
                 break                
-            elif datual > tempo_sinal:
-                if printdadosteste == True:
-                    print('--------------------------------------------------------------------------------\n                               SINAL EXPIRADO\n--------------------------------------------------------------------------------')
+            elif datual > hora_sinal:#Tempo expirado
+                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                 SINAL EXPIRADO\n--------------------------------------------------------------------------------')
                 break
-    else:
-        tempo_sinal = dados[0]
+    else:#Sem condiçoes
+        hora_sinal = dados[0]
         ativo_sinal = dados[1]
         direcao_sinal = dados[2]
-        if printdadosteste == True:
-            print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(tempo_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                               ATIVO NEGADO\n                         SEM CONDIÇOES DE ENTRADA\n--------------------------------------------------------------------------------')
+        print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                               ATIVO NEGADO\n                         SEM CONDIÇOES DE ENTRADA\n--------------------------------------------------------------------------------')
     return
-
-
 
 for sinal in lista:
     dados = sinal.split(',')
-  
+
     ativo_signal = dados[1]
 
     t2 = Thread(target= sinais_thread, args=[])

@@ -15,7 +15,7 @@ def configuracao():  #Função para importar configurações
 config = configuracao()
 
 #Teste delay
-if input_inicial == 's' or input_inicial == 'S' :
+if input_inicial == 'delay' or input_inicial == 'DELAY' :
     API = IQ_Option (config['login'],config['senha'])
     API.connect()
     API.change_balance('PRACTICE')
@@ -37,16 +37,16 @@ if input_inicial == 's' or input_inicial == 'S' :
         if datual == tempo_sinal:
             hora_sinal_entrada = tempo_sinal
             ativo_sinal_entrada = ativo_sinal
-            valor_sinal_entrada = float(config['valor_entrada'])
+            valor_sinal_entrada = 10
             direcao_sinal_entrada = direcao_sinal
-            tempo_sinal_entrada = int(config['tempo'])
+            tempo_sinal_entrada = 1
             print('\nAtivo: ' +str(ativo_sinal_entrada)+ '\nHora: ' +str(hora_sinal_entrada)+ '\nDireção: ' +str(direcao_sinal_entrada)+ '\n--------------------------------------------------------------------------------\n                              ENTROU NA OPERAÇAO\n--------------------------------------------------------------------------------')
 
             status,id = API.buy_digital_spot(ativo_sinal_entrada,valor_sinal_entrada,direcao_sinal_entrada,tempo_sinal_entrada)  
             exit()
 
 #Teste da API
-if input_inicial == 'teste':
+if input_inicial == 'teste' or input_inicial == 'TESTE':
     API = IQ_Option (config['login'],config['senha'])
     API.connect()
     API.change_balance('PRACTICE')

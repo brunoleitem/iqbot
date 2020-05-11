@@ -1,10 +1,10 @@
 from iqoptionapi.stable_api import IQ_Option
-import time, json, logging, configparser
+import time, json, logging, configparser, os
 from threading import Thread
 from datetime import datetime, timedelta
 from dateutil import tz
 
-input_inicial = input('APERTE ENTER PARA INICIAR O ROBÔ\n')
+input_inicial = input('\n--------------------------------------------------------------------------------\n                                ROBÔ DE SINAIS\n                            PARA INICIAR APERTE ENTER\n--------------------------------------------------------------------------------\n')
 
 #Tem que ser loadado primeiro
 def configuracao():  #Função para importar configurações
@@ -52,6 +52,20 @@ if input_inicial == 'teste' or input_inicial == 'TESTE':
     API.change_balance('PRACTICE')
 
 
+    ativo_checkwin = 'EURUSD'
+    hora_checkwin = '2020-05-09 23:28:00'
+    direcao_checkwin = 'call'
+    lucro = 10
+    balance = API.get_balance()
+    currency = API.get_currency()
+    print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_checkwin)+'\n                          Hora: ' +str(hora_checkwin)+'\n                                Direção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                   WIN GALE\n                                  LUCRO: ' +str(round(lucro, 2))+ '\n                              Saldo: ' +str(round(float(balance), 2)), str(currency)+ '\n--------------------------------------------------------------------------------')
+
+    while True:
+        hora1 = API.get_server_timestamp()
+        hora = hora1/1000
+        print(hora)
+        time.sleep(1)
+
     encerrar = input('encerrar?')
     if encerrar == 's':
         exit()
@@ -62,28 +76,34 @@ API = IQ_Option (config['login'],config['senha'])
 API.connect()
 API.change_balance(config['conta'])
 
-def carregar_sinais():  
-        arquivo = open('sinais.txt', encoding='UTF-8')
-        lista = arquivo.read()
-        arquivo.close
+def carregar_sinais():
+        filesize = os.path.getsize("sinais.txt")
+        if filesize == 0:
+            print('\n\n')
+            print('LISTA DE SINAIS VAZIA\nPROGRAMA FECHANDO\n')
+            exit()
+        else:
+            arquivo = open('sinais.txt', encoding='UTF-8')
+            lista = arquivo.read()
+            arquivo.close
+            lista = lista.split('\n')
+            for index,a in enumerate(lista):
+                if a == '':
+                    del lista[index]
 
-        lista = lista.split('\n')
 
-        for index,a in enumerate(lista):
-            if a == '':
-                del lista[index]
-
-        return lista
+            return lista
 
 while True:   #Mensagem de conexão
     if API.check_connect() == False:
-        print('----------------------------------------------ERRO AO SE CONECTAR NESSA PORRA----------------------------------------------\n\n')
+        os.system('cls')
+        print('\n--------------------------------------------------------------------------------\n                                ERRO AO SE CONECTAR\n                           TENTANDO NOVAMENTE\n--------------------------------------------------------------------------------\n\n')
         API.connect()
     else:
-        print('\n\n')
-        print('----------------------------------------------LOGADO PARA SER MILIONARIO----------------------------------------------\n\n')
+        os.system('cls')
+        print('\n--------------------------------------------------------------------------------\n                                LOGADO PARA SER MILIONARIO\n                                       BEM VINDO\n--------------------------------------------------------------------------------')
         break 
-    
+
     time.sleep(1)
     
 def perfil(): 
@@ -126,10 +146,12 @@ def conferepar(atv):
 #VARIAVEIS
 lista = carregar_sinais()
 x = perfil()
+saldo_inicial = API.get_balance()
+
 
 #PRINT DE DADOS 
 print('Nome: ',x['name'],'\n')
-print('Saldo:',round(x['balance'], 2),x['currency'],'\n') 
+print('Saldo:',round(saldo_inicial, 2),API.get_currency(),'\n') 
 print('\n\n')
 
 def sinais_thread ():
@@ -152,16 +174,20 @@ def sinais_thread ():
                 close_candle = candles_get[0]['close']
                 if (close_candle < open_candle and direcao_checkwin == 'call') or (close_candle > open_candle and direcao_checkwin == 'put'):
                     status, id = API.buy_digital_spot(ativo_checkwin,valor_sinal_gale,direcao_checkwin,tempo_checkwin)
-                    print('\nAtivo: ' +str(ativo_checkwin)+ '\nHora: ' +str(hora_checkwin)+ '\nDireção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                          ENTROU NA OPERAÇAO (GALE)\n--------------------------------------------------------------------------------')
+                    print('\n--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_checkwin)+'\n                          Hora: ' +str(hora_checkwin)+'\n                                Direção: ' +str(direcao_checkwin)+  '\n--------------------------------------------------------------------------------\n                          ENTROU NA OPERAÇAO (GALE)\n--------------------------------------------------------------------------------')
                     if isinstance(id, int):    
                         while True:          
                             status,lucro = API.check_win_digital_v2(id)
                             if status:  
                                 if lucro > 0:
-                                    print('\nAtivo: ' +str(ativo_checkwin)+ '\nHora: ' +str(hora_checkwin)+ '\nDireção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                 WIN GALE\n                               LUCRO: ' +str(round(lucro, 2))+ '\n--------------------------------------------------------------------------------')
+                                    balance = API.get_balance()
+                                    currency = API.get_currency()
+                                    print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_checkwin)+'\n                          Hora: ' +str(hora_checkwin)+'\n                                Direção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                   WIN GALE\n                                  LUCRO: ' +str(round(lucro, 2))+ '\n                              Saldo: ' +str(round(float(balance), 2)), str(currency)+ '\n--------------------------------------------------------------------------------')
                                 else:
-                                    print('\nAtivo: ' +str(ativo_checkwin)+ '\nHora: ' +str(hora_checkwin)+ '\nDireção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                 LOSS GALE\n                                PERDA: -'+str(valor_checkwin)+ '\n--------------------------------------------------------------------------------')                               
-                                break
+                                    balance = API.get_balance()
+                                    currency = API.get_currency()
+                                    print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_checkwin)+'\n                          Hora: ' +str(hora_checkwin)+'\n                                Direção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                   LOSS GALE\n                                  PERDA: -'+str(valor_checkwin)+ '\n                              Saldo: ' +str(round(float(balance), 2)), str(currency)+ '\n--------------------------------------------------------------------------------')                                
+                                    break
                         break 
         return
     
@@ -171,7 +197,7 @@ def sinais_thread ():
     valor_sinal = float(config['valor_entrada'])
     tempo_sinal = int(config['timeframe'])
     if str(payout(dados[1],'digital')) > str(config['payout_min']) and conferepar(ativo_signal) == True: #Em espera
-        print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                 EM ESPERA\n--------------------------------------------------------------------------------')
+        print('\n--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_sinal)+'\n                          Hora: ' +str(hora_sinal)+'\n                                Direção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                 EM ESPERA\n--------------------------------------------------------------------------------')
         while True:
             delay = int(config['delay'])
             d = datetime.now() + timedelta(seconds=int(delay))
@@ -179,7 +205,7 @@ def sinais_thread ():
             time.sleep(0.100)
 
             if datual == hora_sinal:
-                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                              ENTROU NA OPERAÇAO\n--------------------------------------------------------------------------------')
+                print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_sinal)+'\n                          Hora: ' +str(hora_sinal)+'\n                                Direção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                              ENTROU NA OPERAÇAO\n--------------------------------------------------------------------------------')
 
                 status, id = API.buy_digital_spot(ativo_sinal,valor_sinal,direcao_sinal,tempo_sinal)
                 if isinstance(id, int):
@@ -193,20 +219,24 @@ def sinais_thread ():
                         
                         if status:  
                             if lucro > 0:
-                                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                     WIN\n                               LUCRO: ' +str(round(lucro, 2))+ '\n--------------------------------------------------------------------------------')
+                                balance = API.get_balance()
+                                currency = API.get_currency()
+                                print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_sinal)+'\n                          Hora: ' +str(hora_sinal)+'\n                                Direção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                     WIN\n                                  LUCRO: -'+str(round(lucro, 2))+ '\n                              Saldo: ' +str(round(float(balance), 2)), str(currency)+ '\n--------------------------------------------------------------------------------')
                             else:
-                                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                    LOSS\n                                PERDA: -'+str(valor_sinal)+ '\n--------------------------------------------------------------------------------')                                 
+                                balance = API.get_balance()
+                                currency = API.get_currency()
+                                print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_sinal)+'\n                          Hora: ' +str(hora_sinal)+'\n                                Direção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                     LOSS\n                                  PERDA: -'+str(valor_sinal)+ '\n                              Saldo: ' +str(round(float(balance), 2)), str(currency)+ '\n--------------------------------------------------------------------------------')
                             break
                     
                 break                
             elif datual > hora_sinal:#Tempo expirado
-                print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                                 SINAL EXPIRADO\n--------------------------------------------------------------------------------')
+                print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_sinal)+'\n                          Hora: ' +str(hora_sinal)+'\n                                Direção: ' +str(direcao_sinal)+  '\n--------------------------------------------------------------------------------\n                                 SINAL EXPIRADO\n--------------------------------------------------------------------------------')
                 break
     else:#Sem condiçoes
         hora_sinal = dados[0]
         ativo_sinal = dados[1]
         direcao_sinal = dados[2]
-        print('\nAtivo: ' +str(ativo_sinal)+ '\nHora: ' +str(hora_sinal)+ '\nDireção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                               ATIVO NEGADO\n                         SEM CONDIÇOES DE ENTRADA\n--------------------------------------------------------------------------------')
+        print('\n--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_sinal)+'\n                          Hora: ' +str(hora_sinal)+'\n                                Direção: ' +str(direcao_sinal)+ '\n--------------------------------------------------------------------------------\n                               ATIVO NEGADO\n                         SEM CONDIÇOES DE ENTRADA\n--------------------------------------------------------------------------------')
     return
 
 for sinal in lista:

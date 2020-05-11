@@ -162,7 +162,7 @@ def sinais_thread ():
         direcao_checkwin = direcao_sinal
         valor_checkwin = valor_sinal
         tempo_checkwin = tempo_sinal
-        valor_sinal_gale = int(valor_checkwin) * int(config['fator_gale'])
+        valor_sinal_gale = float(valor_checkwin) * float(config['fator_gale'])
         prox_sinal = datetime.strptime(hora_checkwin, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=1)
         while True:
             d = datetime.now() + timedelta(seconds=int(delay))
@@ -187,7 +187,7 @@ def sinais_thread ():
                                     balance = API.get_balance()
                                     currency = API.get_currency()
                                     print('--------------------------------------------------------------------------------\n                                Ativo: ' +str(ativo_checkwin)+'\n                          Hora: ' +str(hora_checkwin)+'\n                                Direção: ' +str(direcao_checkwin)+ '\n--------------------------------------------------------------------------------\n                                   LOSS GALE\n                                  PERDA: -'+str(valor_checkwin)+ '\n                              Saldo: ' +str(round(float(balance), 2)), str(currency)+ '\n--------------------------------------------------------------------------------')                                
-                                    break
+                                break
                         break 
         return
     

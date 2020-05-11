@@ -5,11 +5,11 @@ senha = testerobo
 conta = PRACTICE
 
 [ENTRADA]
-payout_min = 80
+payout_min = 50
 valor_entrada = 100
-timeframe = 5
+timeframe = 1
 fator_gale = 2.5
 
 [DELAY]
-ativo_base = EURUSD-OTC
+ativo_base = EURUSD
 delay = 0

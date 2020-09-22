@@ -18,8 +18,8 @@ delay
 teste
 ```
 ### Utilização
->Toda a configuração é feita dentro do arquivo [config.txt]
->Sinais dentro de [sinais.txt]
+Toda a configuração é feita dentro do arquivo [config](https://github.com/brunoleitem/iqbot/blob/master/config.txt).
+Sinais dentro de [sinais](https://github.com/brunoleitem/iqbot/blob/master/sinais.txt).
 ```
 python bot.py
 ```

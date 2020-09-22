@@ -51,7 +51,7 @@ if input_inicial == 'teste' or input_inicial == 'TESTE':
     API.connect()
     API.change_balance('PRACTICE')
 
-
+    #Mudar configurações pra fazer o teste
     ativo_checkwin = 'EURUSD'
     hora_checkwin = '2020-05-09 23:28:00'
     direcao_checkwin = 'call'

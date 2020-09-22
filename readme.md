@@ -1,5 +1,5 @@
 # Bot de Sinais IQ Option
->Robô que lê os sinais enviados e envia ordens para a plataforma da IQ OPTION.
+Robô que lê os sinais enviados e envia ordens para a plataforma da IQ OPTION.
 
 ### Pré Requisitos
 

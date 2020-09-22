@@ -1,6 +1,6 @@
 [LOGIN]
-login = savibrgamer@gmail.com
-senha = testerobo
+login = 
+senha = 
 #PRACTICE, REAL#
 conta = PRACTICE
 

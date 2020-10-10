@@ -5,7 +5,6 @@ Robô que lê os sinais enviados e envia ordens para a plataforma da IQ OPTION.
 
 ```
 python
-pip install datetime
 ```
 
 ### Testes
